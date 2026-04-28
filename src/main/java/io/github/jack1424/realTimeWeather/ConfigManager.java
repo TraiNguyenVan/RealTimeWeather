@@ -18,12 +18,13 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 public class ConfigManager {
+	private static final String DEFAULT_TIME_PLACEHOLDER_FORMAT = "HH:mm z";
 	private final RealTimeWeather rtw;
 	private final FileConfiguration configFile;
 	private TimeZone timeZone;
 	private boolean debug, timeEnabled, weatherEnabled, timeSyncAllWorlds, weatherSyncAllWorlds, blockTimeSetCommand, blockWeatherCommand, disableBedsAtNight, disableBedsDuringThunder;
 	private long updateCheckInterval, timeSyncInterval, weatherSyncInterval;
-	private String sunriseSunset, sunriseSunsetLatitude, sunriseSunsetLongitude, apiKey, weatherLatitude, weatherLongitude, disableBedsAtNightMessage, disableBedsDuringThunderMessage, sunriseCustomTime, sunsetCustomTime;
+	private String sunriseSunset, sunriseSunsetLatitude, sunriseSunsetLongitude, apiKey, weatherLatitude, weatherLongitude, disableBedsAtNightMessage, disableBedsDuringThunderMessage, sunriseCustomTime, sunsetCustomTime, timePlaceholderFormat;
 	private HashSet<World> timeSyncWorlds, weatherSyncWorlds;
 
 	public ConfigManager(RealTimeWeather rtw) {
@@ -52,6 +53,7 @@ public class ConfigManager {
 				setDisableBedsAtNightMessage(configFile.getString("DisableBedsAtNightMessage"));
 				setTimeSyncInterval(configFile.getLong("TimeSyncInterval"));
 				setTimeZone(configFile.getString("Timezone"));
+				setTimePlaceholderFormat(configFile.getString("TimePlaceholderFormat"));
 				setSunriseSunset(configFile.getString("SunriseSunset"));
 				if (getSunriseSunset().equals("real")) {
 					setSunriseSunsetLatitude(configFile.getString("SunriseSunsetLatitude"));
@@ -200,6 +202,27 @@ public class ConfigManager {
 		}
 
 		rtw.debug("TimeZone set to " + value);
+	}
+
+	public String getTimePlaceholderFormat() {
+		return timePlaceholderFormat;
+	}
+
+	public void setTimePlaceholderFormat(String value) {
+		if (value == null || value.isBlank()) {
+			timePlaceholderFormat = DEFAULT_TIME_PLACEHOLDER_FORMAT;
+			rtw.debug("TimePlaceholderFormat set to default (blank value)");
+			return;
+		}
+
+		try {
+			DateTimeFormatter.ofPattern(value);
+			timePlaceholderFormat = value;
+			rtw.debug("TimePlaceholderFormat set to " + value);
+		} catch (IllegalArgumentException e) {
+			timePlaceholderFormat = DEFAULT_TIME_PLACEHOLDER_FORMAT;
+			rtw.getLogger().warning("TimePlaceholderFormat invalid; using default");
+		}
 	}
 
 	public String getSunriseSunset() {
