@@ -34,6 +34,8 @@ public final class RealTimeWeather extends JavaPlugin {
 		if (config.isWeatherEnabled())
 			setupWeather();
 
+		setupPlaceholderAPI();
+
 		getServer().getPluginManager().registerEvents(new EventHandlers(this), this);
 
 		debug("Enabling metrics...");
@@ -112,6 +114,15 @@ public final class RealTimeWeather extends JavaPlugin {
 		debug("Weather sync enabled");
 	}
 
+	private void setupPlaceholderAPI() {
+		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+			new io.github.jack1424.realTimeWeather.placeholders.RealTimeWeatherExpansion(this).register();
+			debug("PlaceholderAPI detected; placeholders enabled");
+		} else {
+			debug("PlaceholderAPI not found; placeholders disabled");
+		}
+	}
+
 	private void setupWeather() {
 		debug("Enabling weather sync...");
 
@@ -128,17 +139,21 @@ public final class RealTimeWeather extends JavaPlugin {
 		for (World world : config.getWeatherSyncWorlds())
 			world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
 
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
+		getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
 			debug("Syncing weather...");
 
 			try {
 				WeatherRequestObject request = new WeatherRequestObject(config.getAPIKey(), config.getWeatherLatitude(), config.getWeatherLongitude());
+				boolean rain = request.isRaining();
+				boolean thunder = request.isThundering();
 
-				debug("Setting weather (Rain: " + request.isRaining() + ", Thunder: " + request.isThundering() + ")...");
-				for (World world : config.getWeatherSyncWorlds()) {
-					world.setStorm(request.isRaining());
-					world.setThundering(request.isThundering());
-				}
+				getServer().getScheduler().runTask(this, () -> {
+					debug("Setting weather (Rain: " + rain + ", Thunder: " + thunder + ")...");
+					for (World world : config.getWeatherSyncWorlds()) {
+						world.setStorm(rain);
+						world.setThundering(thunder);
+					}
+				});
 			} catch (Exception e) {
 				logger.severe("There was an error when attempting to get weather information");
 				debug(e.getMessage());
