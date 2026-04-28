@@ -34,6 +34,8 @@ public final class RealTimeWeather extends JavaPlugin {
 		if (config.isWeatherEnabled())
 			setupWeather();
 
+		setupPlaceholderAPI();
+
 		getServer().getPluginManager().registerEvents(new EventHandlers(this), this);
 
 		debug("Enabling metrics...");
@@ -110,6 +112,15 @@ public final class RealTimeWeather extends JavaPlugin {
 		}, 0L, config.getTimeSyncInterval());
 
 		debug("Weather sync enabled");
+	}
+
+	private void setupPlaceholderAPI() {
+		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+			new io.github.jack1424.realTimeWeather.placeholders.RealTimeWeatherExpansion(this).register();
+			debug("PlaceholderAPI detected; placeholders enabled");
+		} else {
+			debug("PlaceholderAPI not found; placeholders disabled");
+		}
 	}
 
 	private void setupWeather() {
