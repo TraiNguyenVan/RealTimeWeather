@@ -10,14 +10,15 @@ ___
 **Current Features:**
 - Lightweight
 - Easy setup
-- Supports all Minecraft versions from 1.7+
+- ~Supports all Minecraft versions from 1.7+~ (latest version only supports newer versions, fix coming soon)
 - Constant time syncing (including custom or real-world sunrise/sunset times)
 - Weather syncing (rain/snow and thunder)
 - Enable/disable specific worlds
+- Placeholders
 
 **Upcoming Features:**
 - [ ] Commands
-- [ ] Multi-world support
+- [ ] Multi-world configuration support
 - [ ] Folia support
 
 ## Installation
