@@ -6,3 +6,4 @@ api-version: '1.21'
 load: POSTWORLD
 author: Jack1424
 website: github.com/Jack1424/RealTimeWeather
+softdepend: [PlaceholderAPI]
