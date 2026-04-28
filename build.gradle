@@ -14,7 +14,7 @@ repositories {
     }
     maven {
         name = "placeholderapi-repo"
-        url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+        url = "https://repo.helpch.at/releases"
     }
     maven {
         name = "sonatype"
