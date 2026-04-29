@@ -14,14 +14,14 @@ body:
 
 - type: textarea
   attributes:
-    label: What's happening
+    label: What's happening?
     description: Describe the issue that you're having. Make sure to be clear and concise.
   validations:
     required: true
 
 - type: textarea
   attributes:
-    label: What's supposed to happen
+    label: What's supposed to happen?
     description: Describe what should be happening
   validations:
     required: true
@@ -50,18 +50,18 @@ body:
 - type: input
   attributes:
     label: Server log
-    description: If applicable, paste the link to your server log here
+    description: Paste the link to your server log here
     placeholder: Get a link at https://pastebin.com/
   validations:
-    required: false
+    required: true
 
 - type: input
   attributes:
     label: RTW configuration
-    description: If applicable, paste the link to your configuration file here **(REMEMBER TO REMOVE YOUR API KEY)**
+    description: Paste the link to your configuration file here **(REMEMBER TO REMOVE YOUR API KEY)**
     placeholder: Get a link at https://pastebin.com/
   validations:
-    required: false
+    required: true
 
 - type: textarea
   attributes:
