@@ -1,72 +1,51 @@
 plugins {
-    id 'java'
-    id 'com.gradleup.shadow' version '9.4.1'
+    id("java")
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
-group = 'io.github.jack1424'
-version = '1.5.0'
+group = "io.github.jack1424"
+version = "1.5.0"
 
 repositories {
     mavenCentral()
     maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
+        name = "aikar-repo"
+        url = "https://repo.aikar.co/nexus/content/groups/aikar/"
     }
     maven {
         name = "placeholderapi-repo"
         url = "https://repo.helpch.at/releases"
     }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
-    }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.11.6")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
+    compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.12.2")
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
+}
+
+build {
+    dependsOn(shadowJar)
 }
 
 shadowJar {
-    relocate('org.bstats', 'io.github.jack1424.realTimeWeather')
-}
-
-tasks.jar {
-    manifest {
-        attributes["paperweight-mappings-namespace"] = "mojang"
-    }
-}
-
-tasks.shadowJar {
-    manifest {
-        attributes["paperweight-mappings-namespace"] = "mojang"
-    }
-}
-
-def targetJavaVersion = 21
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
+    relocate("org.bstats", "io.github.jack1424.realTimeWeather")
+    relocate("org.json.simple", "io.github.jack1424.realTimeWeather.libs.jsonsimple")
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release.set(targetJavaVersion)
-    }
+    options.encoding = "UTF-8"
+    options.release.set(8)
 }
 
 processResources {
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
+    def props = [version: project.version]
+
+    inputs.properties(props)
+    filteringCharset = "UTF-8"
+
+    filesMatching("plugin.yml") {
+        expand(props)
     }
 }

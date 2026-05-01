@@ -10,11 +10,16 @@ public final class TimePlaceholderFormatter {
 	}
 
 	public static String formatTime(TimeZone timeZone, String pattern) {
-		if (timeZone == null || pattern == null || pattern.isBlank())
+		if (timeZone == null || pattern == null || isBlank(pattern))
 			return "";
 
 		ZoneId zoneId = timeZone.toZoneId();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 		return ZonedDateTime.now(zoneId).format(formatter);
+	}
+
+	// Replacement for String.isBlank()
+	private static boolean isBlank(String s) {
+		return s == null || s.codePoints().allMatch(Character::isWhitespace);
 	}
 }

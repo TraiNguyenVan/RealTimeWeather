@@ -3,7 +3,6 @@ package io.github.jack1424.realTimeWeather;
 import io.github.jack1424.realTimeWeather.requests.*;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
-import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -61,9 +60,9 @@ public final class RealTimeWeather extends JavaPlugin {
 				debug("Re-enabling normal daylight and weather cycles...");
 
 				if (config.isTimeEnabled())
-					world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+					world.setGameRuleValue("doDaylightCycle", "true");
 				if (config.isWeatherEnabled())
-					world.setGameRule(GameRule.DO_WEATHER_CYCLE, true);
+					world.setGameRuleValue("doWeatherCycle", "true");
 			}
 
 		logger.info("Stopping...");
@@ -80,7 +79,7 @@ public final class RealTimeWeather extends JavaPlugin {
 			debug("Using custom sunrise/sunset times. Sunrise: " + config.getSunriseCustomTime() + ", Sunset: " + config.getSunsetCustomTime());
 
 		for (World world : config.getTimeSyncWorlds())
-			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+			world.setGameRuleValue("doDaylightCycle", "false");
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
 			if (config.isTimeEnabled()) {
@@ -137,7 +136,7 @@ public final class RealTimeWeather extends JavaPlugin {
 		}
 
 		for (World world : config.getWeatherSyncWorlds())
-			world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+			world.setGameRuleValue("doWeatherCycle", "false");
 
 		getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
 			debug("Syncing weather...");
@@ -188,9 +187,8 @@ public final class RealTimeWeather extends JavaPlugin {
 		}
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	public String getUpdateCheck() {
-		String currentVersion = this.getPluginMeta().getVersion();
+		String currentVersion = this.getDescription().getVersion();
 		String latestVersion;
 		try {
 			debug("Getting latest version...");

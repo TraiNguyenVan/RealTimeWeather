@@ -209,7 +209,7 @@ public class ConfigManager {
 	}
 
 	public void setTimePlaceholderFormat(String value) {
-		if (value == null || value.isBlank()) {
+		if (value == null || isBlank(value)) {
 			timePlaceholderFormat = DEFAULT_TIME_PLACEHOLDER_FORMAT;
 			rtw.debug("TimePlaceholderFormat set to default (blank value)");
 			return;
@@ -411,5 +411,10 @@ public class ConfigManager {
 
 		weatherLongitude = value;
 		rtw.debug("Longitude set to " + value);
+	}
+
+	// Replacement for String.isBlank()
+	private boolean isBlank(String s) {
+		return s == null || s.codePoints().allMatch(Character::isWhitespace);
 	}
 }

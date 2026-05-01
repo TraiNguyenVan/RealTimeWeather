@@ -26,7 +26,7 @@ public class RealTimeWeatherExpansion extends PlaceholderExpansion {
 
 	@Override
 	public String getVersion() {
-		return rtw.getPluginMeta().getVersion();
+		return rtw.getDescription().getVersion();
 	}
 
 	@Override

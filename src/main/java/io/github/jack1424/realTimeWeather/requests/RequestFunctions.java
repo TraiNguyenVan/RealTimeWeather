@@ -11,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class RequestFunctions {
@@ -27,7 +26,7 @@ public class RequestFunctions {
 
 			StringBuilder response = new StringBuilder();
 			try (InputStream input = con.getInputStream();
-				 Scanner scanner = new Scanner(input, StandardCharsets.UTF_8)) {
+				 Scanner scanner = new Scanner(input)) {
 				while (scanner.hasNextLine())
 					response.append(scanner.nextLine());
 			}
@@ -57,7 +56,7 @@ public class RequestFunctions {
 	}
 
 	public static String getLatestVersion() throws Exception {
-		return ((JSONObject) ((JSONArray) makeRequest("https://api.modrinth.com/v2/project/WRA6ODcm/version")).getFirst()).get("version_number").toString();
+		return ((JSONObject) ((JSONArray) makeRequest("https://api.modrinth.com/v2/project/WRA6ODcm/version")).get(0)).get("version_number").toString();
 	}
 
 	public static class HTTPResponseException extends Exception {
