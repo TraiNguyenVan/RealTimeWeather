@@ -37,6 +37,10 @@ public final class RealTimeWeather extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents(new EventHandlers(this), this);
 
+		RealTimeWeatherCommand rtwCommand = new RealTimeWeatherCommand(this);
+		this.getCommand("realtimeweather").setExecutor(rtwCommand);
+		this.getCommand("realtimeweather").setTabCompleter(rtwCommand);
+
 		debug("Enabling metrics...");
 		Metrics metrics = new Metrics(this, 16709);
 		metrics.addCustomChart(new SimplePie("weather_sync_enabled", () -> String.valueOf(config.isWeatherEnabled())));
@@ -202,6 +206,48 @@ public final class RealTimeWeather extends JavaPlugin {
 			return String.format("RealTimeWeather (v%s) is up to date!", currentVersion);
 		} else
 			return String.format("RealTimeWeather (v%s) is outdated! v%s is the latest version.", currentVersion, latestVersion);
+	}
+
+	public void reloadPlugin() {
+		debug("Reloading plugin...");
+		
+		// Reset gamerules for currently managed worlds before reloading config
+		for (World world : getServer().getWorlds()) {
+			if (world.getEnvironment().equals(World.Environment.NORMAL)) {
+				if (config.isTimeEnabled() && config.getTimeSyncWorlds() != null && config.getTimeSyncWorlds().contains(world)) {
+					world.setGameRuleValue("doDaylightCycle", "true");
+				}
+				if (config.isWeatherEnabled() && config.getWeatherSyncWorlds() != null && config.getWeatherSyncWorlds().contains(world)) {
+					world.setGameRuleValue("doWeatherCycle", "true");
+				}
+			}
+		}
+
+		// Reload configuration file
+		reloadConfig();
+		config.refreshValues();
+
+		// Cancel all scheduled tasks
+		getServer().getScheduler().cancelTasks(this);
+
+		// Re-initialize time and weather cycles
+		debug("TimeSync: " + config.isTimeEnabled());
+		if (config.isTimeEnabled()) {
+			setupTime();
+		}
+
+		debug("WeatherSync: " + config.isWeatherEnabled());
+		if (config.isWeatherEnabled()) {
+			setupWeather();
+		}
+
+		// Re-schedule update check task if needed
+		long updateCheckInterval = config.getUpdateCheckInterval();
+		if (updateCheckInterval > 0) {
+			getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> logger.info(getUpdateCheck()), updateCheckInterval, updateCheckInterval);
+		}
+		
+		logger.info("Plugin successfully reloaded.");
 	}
 
 	public ConfigManager getConfigManager() {
