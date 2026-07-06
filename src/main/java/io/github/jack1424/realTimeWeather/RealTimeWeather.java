@@ -227,10 +227,51 @@ public final class RealTimeWeather extends JavaPlugin {
 		reloadConfig();
 		config.refreshValues();
 
-		// Cancel all scheduled tasks
+		// Rebuild all tasks
+		rebuildTasks();
+		
+		logger.info("Plugin successfully reloaded.");
+	}
+
+	public void toggleTimeSync(boolean enable) {
+		if (!enable) {
+			for (World world : getServer().getWorlds()) {
+				if (world.getEnvironment().equals(World.Environment.NORMAL)) {
+					if (config.isTimeEnabled() && config.getTimeSyncWorlds() != null && config.getTimeSyncWorlds().contains(world)) {
+						world.setGameRuleValue("doDaylightCycle", "true");
+					}
+				}
+			}
+		}
+
+		config.setTimeEnabled(enable);
+		getConfig().set("SyncTime", enable);
+		saveConfig();
+
+		rebuildTasks();
+	}
+
+	public void toggleWeatherSync(boolean enable) {
+		if (!enable) {
+			for (World world : getServer().getWorlds()) {
+				if (world.getEnvironment().equals(World.Environment.NORMAL)) {
+					if (config.isWeatherEnabled() && config.getWeatherSyncWorlds() != null && config.getWeatherSyncWorlds().contains(world)) {
+						world.setGameRuleValue("doWeatherCycle", "true");
+					}
+				}
+			}
+		}
+
+		config.setWeatherEnabled(enable);
+		getConfig().set("SyncWeather", enable);
+		saveConfig();
+
+		rebuildTasks();
+	}
+
+	private void rebuildTasks() {
 		getServer().getScheduler().cancelTasks(this);
 
-		// Re-initialize time and weather cycles
 		debug("TimeSync: " + config.isTimeEnabled());
 		if (config.isTimeEnabled()) {
 			setupTime();
@@ -241,14 +282,12 @@ public final class RealTimeWeather extends JavaPlugin {
 			setupWeather();
 		}
 
-		// Re-schedule update check task if needed
 		long updateCheckInterval = config.getUpdateCheckInterval();
 		if (updateCheckInterval > 0) {
 			getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> logger.info(getUpdateCheck()), updateCheckInterval, updateCheckInterval);
 		}
-		
-		logger.info("Plugin successfully reloaded.");
 	}
+
 
 	public ConfigManager getConfigManager() {
 		return config;
