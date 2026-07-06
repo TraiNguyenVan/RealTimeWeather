@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [feature/reload-and-sync]
+    branches: [build]
   workflow_dispatch:
 
 jobs:
